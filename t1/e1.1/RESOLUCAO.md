@@ -29,10 +29,10 @@ segunda desce para 0. Replicar ajuda a leitura e atrapalha a escrita síncrona.
 ## Caso geral
 
 Seja `X` o número de servidores no ar. Cada servidor é um ensaio de Bernoulli
-independente, então `X ~ Binomial(n, p)`:
+independente, então `X ~ Binomial(n, p)`. para X recebendo i temos: 
 
 ```
-P[X = i] = C(n, i) · p^i · (1 − p)^(n − i)
+P[i] = C(n, i) · p^i · (1 − p)^(n − i)
 ```
 
 `p^i` é a chance de `i` servidores específicos estarem no ar, `(1−p)^(n−i)` a dos
@@ -68,3 +68,6 @@ Vale lembrar que a hipótese de independência torna o resultado otimista. Falha
 correlacionadas (uma zona inteira, um deploy ruim) derrubam várias réplicas de uma
 vez, então o número calculado aqui é um teto, não uma previsão de SLA.
 
+---
+
+Implementação e validação numérica em [`../e1.2/`](../e1.2/).
