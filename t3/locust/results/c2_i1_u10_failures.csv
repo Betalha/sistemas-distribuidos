@@ -1,0 +1,3 @@
+Method,Name,Error,Occurrences
+GET,post,"gaierror(-2, 'Name or service not known')",33
+GET,post,"ConnectionRefusedError(111, 'Connection refused')",1

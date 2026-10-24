@@ -1,0 +1,5 @@
+Method,Name,Error,Occurrences
+GET,post,"gaierror(-2, 'Name or service not known')",40
+GET,post,HTTPError('502 Server Error: Bad Gateway for url: post'),181
+GET,post,"ConnectionResetError(104, 'Connection reset by peer')",2
+GET,post,"ConnectionRefusedError(111, 'Connection refused')",2

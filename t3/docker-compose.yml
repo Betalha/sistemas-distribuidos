@@ -1,0 +1,62 @@
+services:
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+    volumes:
+      - db_data:/var/lib/mysql
+
+  # Um único serviço escalável: docker compose up -d --scale wordpress=N
+  wordpress:
+    image: wordpress:5.4.2-php7.2-apache
+    depends_on: [db]
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - ./html:/var/www/html
+
+  nginx:
+    image: nginx:1.19.0
+    restart: always
+    depends_on: [wordpress]
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+
+  # Fora do "docker compose up": chamado à parte (docker compose run locust / run.sh)
+  locust:
+    image: locustio/locust:2.32.0
+    profiles: [locust]
+    depends_on: [nginx]
+    ports:
+      - "8089:8089"
+    volumes:
+      - ./locust:/mnt/locust
+    command: -f /mnt/locust/locustfile.py -H http://nginx
+
+  # Só para instalar o WordPress e criar os posts (setup.sh)
+  wpcli:
+    image: wordpress:cli-2.4.0-php7.2
+    profiles: [tools]
+    user: "33:33"
+    depends_on: [db]
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - ./html:/var/www/html
+      - ./conteudo:/conteudo:ro
+
+volumes:
+  db_data:
