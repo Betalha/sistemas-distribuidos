@@ -10,9 +10,11 @@ services:
     volumes:
       - db_data:/var/lib/mysql
 
-  # Um único serviço escalável: docker compose up -d --scale wordpress=N
+  # Um único serviço escalável: 3 réplicas por padrão; --scale wordpress=N sobrescreve
   wordpress:
     image: wordpress:5.4.2-php7.2-apache
+    deploy:
+      replicas: 3
     depends_on: [db]
     restart: always
     environment:

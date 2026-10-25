@@ -36,8 +36,8 @@ A aplicação e os testes são executados separadamente.
 **1. Aplicação**
 
 ```bash
-docker compose up -d                       # db + 1 WordPress + nginx (o Locust não sobe)
-docker compose up -d --scale wordpress=3   # com 3 instâncias
+docker compose up -d                       # db + 3 WordPress + nginx (o Locust não sobe)
+docker compose up -d --scale wordpress=1   # com outra quantidade de instâncias
 ```
 
 Na primeira vez, instale o WordPress em http://localhost e crie os 3 posts dos cenários
