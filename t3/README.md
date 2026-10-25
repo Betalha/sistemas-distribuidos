@@ -14,48 +14,66 @@ Este trabalho usa a mesma arquitetura do Trabalho 2 (Nginx balanceando WordPress
 
 | Arquivo | Função |
 |---|---|
-| `docker-compose.yml` | db, wordpress (escalável), nginx, locust e wpcli (só para o setup) |
-| `nginx.conf` | `upstream wordpress { server wordpress:80; }`, em round-robin |
-| `locust/locustfile.py` | Usuário que faz GET no post (`POST=/?p=ID`) e baixa as imagens dele, como faria um navegador |
-| `gerar_conteudo.py` | Gera a imagem de ~1MB, o texto de ~400KB e a imagem de ~300KB em `conteudo/` |
-| `setup.sh` | Sobe a stack, instala o WordPress via WP-CLI e cria os 3 posts (IDs em `locust/posts.env`) |
-| `run.sh` | Roda a matriz 3 cenários × {1,2,3} instâncias × {10,100,1000} usuários |
+| `docker-compose.yml` | db, wordpress (escalável), nginx e locust (perfil `locust`) |
+| `nginx.conf` | `upstream wordpress { server wordpress:80; }` em round-robin |
+| `locust/posts.env` | Caminho dos 3 posts dos cenários (`S1`, `S2`, `S3`) |
+| `locust/locustfile.py` | Visitante que abre o post (`POST`) e baixa as imagens dele, como um navegador |
+| `testes.sh` | Roda a matriz 3 cenários × {1,2,3} instâncias × {100,1000,10000} usuários e chama o `graficos.py` |
 | `graficos.py` | Lê os CSVs do Locust e gera `graficos/*.png` e `graficos/resumo.csv` |
+
+Os parâmetros de cada arquivo (duração, quantidades, espera) ficam declarados no topo dele.
 
 ## Pré-requisitos
 
 - Docker com Compose v2
-- Python 3 com `pillow`, `pandas` e `matplotlib` (`pip install pillow pandas matplotlib`)
-- A porta 80 e a 8089 livres no host
+- Python 3 com `pandas` e `matplotlib` (`pip install pandas matplotlib`)
+- Portas 80 e 8089 livres no host
 
 ## Passo a passo
 
+A aplicação e os testes são executados separadamente.
+
+**1. Aplicação**
+
 ```bash
-./setup.sh      # 1. sobe tudo, instala o WP (admin/admin) e cria os posts dos cenários
-./run.sh        # 2. roda os 27 testes (60s cada, ~35 min) e gera os gráficos
+docker compose up -d                       # db + 1 WordPress + nginx (o Locust não sobe)
+docker compose up -d --scale wordpress=3   # com 3 instâncias
 ```
 
-Variáveis do `run.sh`: `DURACAO=30s`, `INSTANCIAS="1 2 3"` e `USUARIOS="10 100 1000"`.
-Exemplo: `DURACAO=2m USUARIOS="50 500" ./run.sh`.
+Na primeira vez, instale o WordPress em http://localhost e crie os 3 posts dos cenários
+(imagem de ~1MB, texto de ~400KB, imagem de ~300KB). Grave o caminho de cada post em `locust/posts.env`:
 
-Para subir só o site, sem o Locust: `docker compose up -d` (ou `docker compose up -d --scale wordpress=3`).
-O Locust tem `profiles: [locust]` e só é executado quando chamado à parte:
+```
+S1=/2026/10/24/cenario-1-imagem-de-1mb/
+S2=/2026/10/24/cenario-2-texto-de-400kb/
+S3=/2026/10/24/cenario-3-imagem-de-300kb/
+```
+
+**2. Testes de carga** (comando próprio)
+
+```bash
+./testes.sh         # 27 execuções de 60s (~35 min) + gráficos
+DURACAO=30s USUARIOS="100 1000" INSTANCIAS="1 3" CENARIOS="2" ./testes.sh   # subconjunto
+```
+
+O `testes.sh` muda a escala do serviço `wordpress` e reinicia o nginx a cada quantidade de instâncias.
+
+**Locust avulso**, pela interface web em http://localhost:8089:
 
 ```bash
 source locust/posts.env
-POST="/?p=$S1" docker compose run --rm --service-ports -e POST locust   # interface web em http://localhost:8089
-POST="/?p=$S1" docker compose run --rm -e POST locust \
-  -f /mnt/locust/locustfile.py -H http://nginx --headless -u 100 -r 10 -t 60s   # teste direto no terminal
+POST="$S1" docker compose run --rm --service-ports -e POST locust
 ```
 
 Para conferir o balanceamento: `for i in $(seq 6); do curl -sI http://localhost/ | grep -i x-upstream; done`
 
-Para limpar tudo: `docker compose down -v && sudo rm -rf html`
+Para parar: `docker compose down` (com `-v` apaga também o banco e os posts).
 
 ## Detalhes importantes
 
+- **Links permanentes**: o `posts.env` guarda o caminho do post (ex.: `/2026/10/24/cenario-1-.../`) e não `?p=ID`, porque o `?p=ID` gera um redirecionamento para `http://localhost`.
 - **Endereço testado**: o Locust acessa `http://nginx`, que é o nome do serviço no compose, como o enunciado pede. O `siteurl` do WordPress é `http://localhost`, então o locustfile envia `Host: localhost`. Sem esse cabeçalho, o WordPress redirecionaria para `localhost`, que dentro do contêiner aponta para o próprio Locust.
-- **Troca do número de instâncias**: o Nginx resolve o DNS só quando inicia, por isso o `run.sh` reinicia o Nginx depois de cada `--scale`.
+- **Troca do número de instâncias**: o Nginx resolve o DNS só quando inicia, por isso o `testes.sh` reinicia o Nginx depois de cada `--scale`.
 - **Comportamento do usuário**: cada usuário espera de 1 a 3s entre as tarefas (`between(1, 3)`). A taxa de criação é de até 100 usuários/s.
 - **API do Locust**: o enunciado usa `HttpLocust`/`TaskSet`, do Locust 0.x, que já foi removido. A versão 2.x usa `HttpUser` e `wait_time`, e o `-c/-r` virou `-u/-r`.
 

@@ -3,7 +3,7 @@ import re
 
 from locust import HttpUser, between, task
 
-POST = os.environ.get("POST", "/?p=1")   # post do cenário, passado pelo testes.sh
+POST = os.environ.get("POST", "/")       # caminho do post do cenário, passado pelo testes.sh
 HOST_DO_SITE = "localhost"               # siteurl do WordPress; evita redirecionamento
 ESPERA_MIN, ESPERA_MAX = 1, 3            # segundos entre um acesso e outro
 IMAGENS = re.compile(r'(/wp-content/uploads/[^"\'\s?]+)')

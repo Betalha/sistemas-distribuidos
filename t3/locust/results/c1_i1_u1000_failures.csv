@@ -1,3 +1,1 @@
 Method,Name,Error,Occurrences
-GET,post,HTTPError('500 Server Error: Internal Server Error for url: post'),64
-GET,imagem,HTTPError('500 Server Error: Internal Server Error for url: imagem'),1065

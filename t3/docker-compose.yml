@@ -27,6 +27,8 @@ services:
     image: nginx:1.19.0
     restart: always
     depends_on: [wordpress]
+    ulimits:
+      nofile: 65535   # o padrão (1024) gerava "Too many open files" com 1000 usuários
     ports:
       - "80:80"
     volumes:
@@ -37,26 +39,13 @@ services:
     image: locustio/locust:2.32.0
     profiles: [locust]
     depends_on: [nginx]
+    ulimits:
+      nofile: 65535
     ports:
       - "8089:8089"
     volumes:
       - ./locust:/mnt/locust
     command: -f /mnt/locust/locustfile.py -H http://nginx
-
-  # Só para instalar o WordPress e criar os posts (setup.sh)
-  wpcli:
-    image: wordpress:cli-2.4.0-php7.2
-    profiles: [tools]
-    user: "33:33"
-    depends_on: [db]
-    environment:
-      WORDPRESS_DB_HOST: db:3306
-      WORDPRESS_DB_USER: wordpress
-      WORDPRESS_DB_PASSWORD: wordpress
-      WORDPRESS_DB_NAME: wordpress
-    volumes:
-      - ./html:/var/www/html
-      - ./conteudo:/conteudo:ro
 
 volumes:
   db_data:
