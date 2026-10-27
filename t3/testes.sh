@@ -13,6 +13,7 @@ CENARIOS="${CENARIOS:-1 2 3}"
 TEMPO_RAMPA=10                        # segundos para criar todos os usuários
 PROCESSOS_LOCUST=4                    # processos geradores de carga (1 só não aguenta 10000 usuários)
 ESPERA_NGINX=5                        # segundos para o nginx subir após reiniciar
+ESPERA_ENTRE_TESTES=20                # pausa para o sistema esvaziar a fila do teste anterior
 ALVO="http://nginx"                   # nome do serviço no docker-compose
 POSTS_ENV="locust/posts.env"
 RESULTADOS="/mnt/locust/results"      # ./locust/results visto de dentro do contêiner
@@ -37,10 +38,11 @@ rodar_teste() {  # $1 = cenário, $2 = instâncias, $3 = usuários
   local taxa=$(( $3 / TEMPO_RAMPA > 0 ? $3 / TEMPO_RAMPA : 1 ))
 
   echo ">>> cenário $1 | $2 instância(s) | $3 usuários"
-  docker compose run --rm -T -e POST="${!caminho_var}" locust \
+  docker compose run --rm -T --no-deps -e POST="${!caminho_var}" locust \
     -f /mnt/locust/locustfile.py -H "$ALVO" --headless --processes "$PROCESSOS_LOCUST" \
     -u "$3" -r "$taxa" -t "$DURACAO" \
     --csv "$RESULTADOS/c$1_i$2_u$3" --only-summary || true
+  sleep "$ESPERA_ENTRE_TESTES"
 }
 
 main() {

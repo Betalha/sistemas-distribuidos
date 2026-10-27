@@ -1,3 +1,1 @@
 Method,Name,Error,Occurrences
-GET,post,HTTPError('502 Server Error: Bad Gateway for url: post'),677
-GET,imagem,HTTPError('502 Server Error: Bad Gateway for url: imagem'),362

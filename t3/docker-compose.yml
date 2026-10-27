@@ -1,6 +1,8 @@
 services:
   db:
     image: mysql:5.7
+    # o padrão (151) gerava erro 500 com 2+ instâncias: cada Apache abre até 150 conexões
+    command: --max-connections=1000
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root

@@ -73,7 +73,8 @@ Para parar: `docker compose down` (com `-v` apaga também o banco e os posts).
 
 - **Links permanentes**: o `posts.env` guarda o caminho do post (ex.: `/2026/10/24/cenario-1-.../`) e não `?p=ID`, porque o `?p=ID` gera um redirecionamento para `http://localhost`.
 - **Endereço testado**: o Locust acessa `http://nginx`, que é o nome do serviço no compose, como o enunciado pede. O `siteurl` do WordPress é `http://localhost`, então o locustfile envia `Host: localhost`. Sem esse cabeçalho, o WordPress redirecionaria para `localhost`, que dentro do contêiner aponta para o próprio Locust.
-- **Troca do número de instâncias**: o Nginx resolve o DNS só quando inicia, por isso o `testes.sh` reinicia o Nginx depois de cada `--scale`.
+- **Conexões do MySQL**: cada WordPress (Apache) abre até 150 conexões, e o padrão do MySQL é 151. Com 2 ou 3 instâncias isso gerava erro 500, por isso o `db` sobe com `--max-connections=1000`.
+- **Troca do número de instâncias**: o Nginx resolve o DNS só quando inicia, por isso o `testes.sh` reinicia o Nginx depois de cada `--scale`. O Locust roda com `--no-deps`, senão o compose voltaria o WordPress para 3 réplicas.
 - **Comportamento do usuário**: cada usuário espera de 1 a 3s entre as tarefas (`between(1, 3)`). A taxa de criação é de até 100 usuários/s.
 - **API do Locust**: o enunciado usa `HttpLocust`/`TaskSet`, do Locust 0.x, que já foi removido. A versão 2.x usa `HttpUser` e `wait_time`, e o `-c/-r` virou `-u/-r`.
 
