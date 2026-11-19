@@ -1,0 +1,10 @@
+CONTAINER ID   NAME             CPU %     MEM USAGE / LIMIT     MEM %     NET I/O          BLOCK I/O         PIDS
+475bb4c38ee4   t6-soap-1        0.22%     37.38MiB / 11.28GiB   0.32%     94.6MB / 476MB   5.32MB / 1.54MB   1
+e4151fdb9fd6   t6-rest-1        0.22%     39.52MiB / 11.28GiB   0.34%     39.8MB / 212MB   328kB / 2.41MB    1
+3343546abec0   t6-graphql-1     0.21%     62.76MiB / 11.28GiB   0.54%     12.5MB / 46MB    2.85MB / 1.06MB   38
+64aaac15c2a0   t6-grpc-1        0.17%     20.41MiB / 11.28GiB   0.18%     33.7MB / 193MB   8.84MB / 1.57MB   20
+4f9ea550677e   t3-wordpress-3   0.00%     3.773MiB / 11.28GiB   0.03%     623kB / 956B     18.9MB / 8.59MB   6
+7ad1b5670a5f   t3-wordpress-2   0.00%     3.242MiB / 11.28GiB   0.03%     623kB / 956B     12.8MB / 8.54MB   6
+83cf0b43e272   t3-db-1          0.05%     5.566MiB / 11.28GiB   0.05%     632kB / 1.93kB   51MB / 63.1MB     28
+cf1902b6eb1d   t3-wordpress-1   0.00%     3.41MiB / 11.28GiB    0.03%     623kB / 956B     20.9MB / 8.36MB   6
+304f4b3f57f2   t3-nginx-1       0.00%     4.656MiB / 11.28GiB   0.04%     622kB / 126B     14.2MB / 114MB    17

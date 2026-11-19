@@ -1,0 +1,27 @@
+# 4 serviços equivalentes, cada um limitado a 1 CPU (comparação justa). Locust roda no mesmo host (limitação declarada).
+x-svc: &svc
+  build: ./app
+  cpus: 1
+  restart: "no"
+services:
+  rest:
+    <<: *svc
+    command: uvicorn rest_server:app --host 0.0.0.0 --port 8000 --log-level warning
+    ports: ["8001:8000"]
+  graphql:
+    <<: *svc
+    command: uvicorn graphql_server:app --host 0.0.0.0 --port 8000 --log-level warning
+    ports: ["8002:8000"]
+  soap:
+    <<: *svc
+    command: uvicorn soap_server:app --host 0.0.0.0 --port 8000 --log-level warning
+    ports: ["8003:8000"]
+  grpc:
+    <<: *svc
+    command: python grpc_server.py
+    ports: ["8004:8000"]
+  locust:
+    build: ./app
+    profiles: ["tools"]
+    volumes: ["./resultados:/resultados"]
+    ulimits: {nofile: 65536}

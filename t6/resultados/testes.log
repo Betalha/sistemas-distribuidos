@@ -1,0 +1,117 @@
+ Image t6-grpc Building 
+ Image t6-rest Building 
+ Image t6-graphql Building 
+ Image t6-soap Building 
+#1 [internal] load local bake definitions
+#1 reading from stdin 1.91kB done
+#1 DONE 0.0s
+
+#2 [soap internal] load build definition from Dockerfile
+#2 transferring dockerfile: 318B done
+#2 DONE 0.0s
+
+#3 [rest internal] load metadata for docker.io/library/python:3.12-slim
+#3 DONE 0.0s
+
+#4 [graphql internal] load .dockerignore
+#4 transferring context: 2B done
+#4 DONE 0.0s
+
+#5 [rest internal] load build context
+#5 DONE 0.0s
+
+#6 [rest 1/5] FROM docker.io/library/python:3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b
+#6 resolve docker.io/library/python:3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b
+#6 resolve docker.io/library/python:3.12-slim@sha256:5e2bdb1b0d542d5039cffb8181c65930093949194a65c365dfb1b0fe13a4fa5b 0.1s done
+#6 DONE 0.1s
+
+#5 [rest internal] load build context
+#5 transferring context: 734B done
+#5 DONE 0.0s
+
+#7 [soap 2/5] RUN pip install --no-cache-dir fastapi uvicorn strawberry-graphql grpcio grpcio-tools locust
+#7 CACHED
+
+#8 [soap 3/5] WORKDIR /app
+#8 CACHED
+
+#9 [soap 4/5] COPY . .
+#9 CACHED
+
+#10 [grpc 5/5] RUN python -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. music.proto
+#10 CACHED
+
+#11 [grpc] exporting to image
+#11 exporting layers done
+#11 exporting manifest sha256:f2372ff330b28df424c1a7b4fb4d779240175d133b63878120e265e3464859ca 0.0s done
+#11 exporting config sha256:fb15150ea6738a9a1e49214cdf0e85986410a92eb89b1c337ef6193874c096ad 0.0s done
+#11 exporting attestation manifest sha256:a787a2fe52ed28454b5be93344277ad8297b2ff03623f91595812744c806f11d 0.1s done
+#11 exporting manifest list sha256:2c1fbc5d3a9becb1e5ed0d74fe3d53c561700a263dc92f413fe5bb9427b605cc
+#11 exporting manifest list sha256:2c1fbc5d3a9becb1e5ed0d74fe3d53c561700a263dc92f413fe5bb9427b605cc 0.0s done
+#11 naming to docker.io/library/t6-grpc:latest 0.0s done
+#11 unpacking to docker.io/library/t6-grpc:latest
+#11 unpacking to docker.io/library/t6-grpc:latest 0.0s done
+#11 DONE 0.4s
+
+#12 [soap] exporting to image
+#12 exporting layers done
+#12 exporting manifest sha256:87c8b7015d9f967c994a8d858417ac61f70d10b46d285e02ce7278e4e318f1b3 0.1s done
+#12 exporting config sha256:8b2d3b7fcb28d922f9e468dd9a5dd351a13ac50d6141f0f35ca34f10ac727aeb 0.1s done
+#12 exporting attestation manifest sha256:f0f6136314b7b013fc2d08af6fc6a93a8b85ab8d546cbdf595cc2f826a185223 0.1s done
+#12 exporting manifest list sha256:5360f44c77210525b80e05e3a9f6404a16e28defbf78b7dd572cb6428b37f60b 0.1s done
+#12 naming to docker.io/library/t6-soap:latest 0.0s done
+#12 unpacking to docker.io/library/t6-soap:latest 0.0s done
+#12 DONE 0.4s
+
+#13 [graphql] exporting to image
+#13 exporting layers done
+#13 exporting manifest sha256:2c47bca5d1ce0091b08eaf779698d27e5c2ecb3f79d44199cc0fcfadf5f49fe2 0.1s done
+#13 exporting config sha256:ac1cce67588a2ffd943e2581bcf010c797d5a813ed93001b0a5723f30492c6c6 0.1s done
+#13 exporting attestation manifest sha256:b26919dec26523d1f575c0590c06e538475fc736b039ae24dded5f67629ef70a 0.1s done
+#13 exporting manifest list sha256:1910bc41136082b8f5e6dda54cc459cfc506f9939f1936352f7c4abb33e23527 0.1s done
+#13 naming to docker.io/library/t6-graphql:latest 0.0s done
+#13 unpacking to docker.io/library/t6-graphql:latest 0.0s done
+#13 DONE 0.4s
+
+#14 [rest] exporting to image
+#14 exporting layers done
+#14 exporting manifest sha256:5a326bf31cbc5b02fc53f2cdadff4bb67ba42c37c2b30facf253047dbb0c135f 0.1s done
+#14 exporting config sha256:68f585df21ff63152458df9f34cb1fca4f1c44ab4af2ca568ef867fe94673d37 0.1s done
+#14 exporting attestation manifest sha256:12ce44aba1a3713d2099c5612eb0155648ae8b95f8fc66cff7f57f4b0ca2674f 0.1s done
+#14 exporting manifest list sha256:445a6983adc7ca8b0a3191a6c220113a31927e58f4a293aa2fe8fdb503a386d1 0.1s done
+#14 naming to docker.io/library/t6-rest:latest 0.0s done
+#14 unpacking to docker.io/library/t6-rest:latest 0.0s done
+#14 DONE 0.4s
+
+#15 [grpc] resolving provenance for metadata file
+#15 ...
+
+#16 [graphql] resolving provenance for metadata file
+#16 DONE 0.1s
+
+#15 [grpc] resolving provenance for metadata file
+#15 DONE 0.2s
+
+#17 [rest] resolving provenance for metadata file
+#17 DONE 0.2s
+
+#18 [soap] resolving provenance for metadata file
+#18 DONE 0.0s
+ Image t6-soap Built 
+ Image t6-graphql Built 
+ Image t6-grpc Built 
+ Image t6-rest Built 
+ Container t6-grpc-1 Running 
+ Container t6-graphql-1 Recreate 
+ Container t6-soap-1 Recreate 
+ Container t6-rest-1 Recreate 
+ Container t6-soap-1 Recreated 
+ Container t6-rest-1 Recreated 
+ Container t6-graphql-1 Recreated 
+ Container t6-soap-1 Starting 
+ Container t6-graphql-1 Starting 
+ Container t6-rest-1 Starting 
+ Container t6-soap-1 Started 
+ Container t6-graphql-1 Started 
+ Container t6-rest-1 Started 
+fim. Rode: python3 graficos.py
