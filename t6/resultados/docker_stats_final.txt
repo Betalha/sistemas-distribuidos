@@ -1,10 +1,14 @@
-CONTAINER ID   NAME             CPU %     MEM USAGE / LIMIT     MEM %     NET I/O          BLOCK I/O         PIDS
-475bb4c38ee4   t6-soap-1        0.22%     37.38MiB / 11.28GiB   0.32%     94.6MB / 476MB   5.32MB / 1.54MB   1
-e4151fdb9fd6   t6-rest-1        0.22%     39.52MiB / 11.28GiB   0.34%     39.8MB / 212MB   328kB / 2.41MB    1
-3343546abec0   t6-graphql-1     0.21%     62.76MiB / 11.28GiB   0.54%     12.5MB / 46MB    2.85MB / 1.06MB   38
-64aaac15c2a0   t6-grpc-1        0.17%     20.41MiB / 11.28GiB   0.18%     33.7MB / 193MB   8.84MB / 1.57MB   20
-4f9ea550677e   t3-wordpress-3   0.00%     3.773MiB / 11.28GiB   0.03%     623kB / 956B     18.9MB / 8.59MB   6
-7ad1b5670a5f   t3-wordpress-2   0.00%     3.242MiB / 11.28GiB   0.03%     623kB / 956B     12.8MB / 8.54MB   6
-83cf0b43e272   t3-db-1          0.05%     5.566MiB / 11.28GiB   0.05%     632kB / 1.93kB   51MB / 63.1MB     28
-cf1902b6eb1d   t3-wordpress-1   0.00%     3.41MiB / 11.28GiB    0.03%     623kB / 956B     20.9MB / 8.36MB   6
-304f4b3f57f2   t3-nginx-1       0.00%     4.656MiB / 11.28GiB   0.04%     622kB / 126B     14.2MB / 114MB    17
+CONTAINER ID   NAME                CPU %     MEM USAGE / LIMIT     MEM %     NET I/O           BLOCK I/O         PIDS
+7a2be7891b7e   t6-graphql-1        0.23%     62.88MiB / 11.28GiB   0.54%     13.6MB / 50.4MB   1.15MB / 373kB    24
+181ef41b330e   t6-rest-1           0.23%     41.63MiB / 11.28GiB   0.36%     42.1MB / 230MB    1.04MB / 360kB    1
+c2dca780816e   t6-grpc-1           0.14%     24.22MiB / 11.28GiB   0.21%     34.4MB / 198MB    373kB / 295kB     20
+1775281cb220   t6-soap-1           0.22%     39.49MiB / 11.28GiB   0.34%     95.5MB / 483MB    328kB / 410kB     1
+b88902915a72   t6-java-grpc-1      0.13%     142.4MiB / 11.28GiB   1.23%     37MB / 224MB      0B / 1.44MB       38
+19079b249ec9   t6-java-graphql-1   0.12%     230MiB / 11.28GiB     1.99%     96.3MB / 313MB    1.35MB / 1.4MB    19
+9b07c735ed00   t6-java-rest-1      0.13%     172MiB / 11.28GiB     1.49%     71.4MB / 322MB    2.56MB / 1.43MB   19
+4ebdeaf06775   t6-java-soap-1      0.12%     223.4MiB / 11.28GiB   1.93%     114MB / 515MB     45.1kB / 1.39MB   19
+4f9ea550677e   t3-wordpress-3      0.00%     12.89MiB / 11.28GiB   0.11%     99.6kB / 956B     13.4MB / 0B       6
+7ad1b5670a5f   t3-wordpress-2      0.00%     14.64MiB / 11.28GiB   0.13%     99.6kB / 966B     17.9MB / 0B       6
+83cf0b43e272   t3-db-1             0.09%     165.1MiB / 11.28GiB   1.43%     102kB / 2.02kB    35.7MB / 1.09MB   28
+cf1902b6eb1d   t3-wordpress-1      0.00%     12.94MiB / 11.28GiB   0.11%     99.5kB / 956B     18.7MB / 0B       6
+304f4b3f57f2   t3-nginx-1          0.00%     112MiB / 11.28GiB     0.97%     99.1kB / 126B     7.73MB / 0B       17

@@ -5,8 +5,9 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-TECS = ["rest", "graphql", "soap", "grpc"]
-NOMES = {"rest": "REST", "graphql": "GraphQL", "soap": "SOAP", "grpc": "gRPC"}
+BASE = {"rest": "REST", "graphql": "GraphQL", "soap": "SOAP", "grpc": "gRPC"}
+TECS = list(BASE) + ["java_" + t for t in BASE]
+NOMES = {**{t: n + " (Python)" for t, n in BASE.items()}, **{"java_" + t: n + " (Java)" for t, n in BASE.items()}}
 
 
 def carregar(pasta="resultados"):
@@ -28,10 +29,10 @@ def linha(df, col, titulo, ylabel, arq, logy=False):
     plt.figure(figsize=(7, 4.2))
     for tec in TECS:
         d = t[t.tec == tec].sort_values("usuarios")
-        plt.plot(d.usuarios, d[col], marker="o", label=NOMES[tec])
+        plt.plot(d.usuarios, d[col], marker="o", ls="-" if tec in BASE else "--", label=NOMES[tec])
     plt.xscale("log"); plt.xlabel("usuários simultâneos"); plt.ylabel(ylabel); plt.title(titulo)
     if logy: plt.yscale("log")
-    plt.grid(alpha=.3); plt.legend(); plt.tight_layout(); plt.savefig(f"graficos/{arq}.png", dpi=150); plt.close()
+    plt.grid(alpha=.3); plt.legend(fontsize=7, ncol=2); plt.tight_layout(); plt.savefig(f"graficos/{arq}.png", dpi=150); plt.close()
 
 
 def barras_bytes(df, usuarios, arq="bytes_por_operacao"):

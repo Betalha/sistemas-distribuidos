@@ -1,6 +1,10 @@
-# 4 serviços equivalentes, cada um limitado a 1 CPU (comparação justa). Locust roda no mesmo host (limitação declarada).
+# 8 serviços (4 em Python, 4 em Java), cada um limitado a 1 CPU (comparação justa). Locust roda no mesmo host (limitação declarada).
 x-svc: &svc
   build: ./app
+  cpus: 1
+  restart: "no"
+x-java: &java
+  build: ./java
   cpus: 1
   restart: "no"
 services:
@@ -20,6 +24,22 @@ services:
     <<: *svc
     command: python grpc_server.py
     ports: ["8004:8000"]
+  java-rest:
+    <<: *java
+    command: ["rest"]
+    ports: ["8011:8000"]
+  java-graphql:
+    <<: *java
+    command: ["graphql"]
+    ports: ["8012:8000"]
+  java-soap:
+    <<: *java
+    command: ["soap"]
+    ports: ["8013:8000"]
+  java-grpc:
+    <<: *java
+    command: ["grpc"]
+    ports: ["8014:8000"]
   locust:
     build: ./app
     profiles: ["tools"]
