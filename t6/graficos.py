@@ -12,41 +12,44 @@ NOMES = {**{t: n + " (Python)" for t, n in BASE.items()}, **{"java_" + t: n + " 
 
 def carregar(pasta="resultados"):
     linhas = []
-    for f in glob.glob(f"{pasta}/*_stats.csv"):
+    for f in glob.glob(f"{pasta}/**/*_stats.csv", recursive=True):
         m = re.search(r"(\w+?)_u(\d+)_stats\.csv$", f)
         if not m:
             continue
         df = pd.read_csv(f)
         for _, r in df.iterrows():
-            linhas.append({"tec": m[1], "usuarios": int(m[2]), "op": "TOTAL" if r["Name"] == "Aggregated" else r["Name"],
+            linhas.append({"tec": m[1], "rep": os.path.basename(os.path.dirname(f)), "usuarios": int(m[2]), "op": "TOTAL" if r["Name"] == "Aggregated" else r["Name"],
                            "reqs": r["Request Count"], "falhas": r["Failure Count"], "media_ms": r["Average Response Time"],
                            "p95_ms": r["95%"], "rps": r["Requests/s"], "bytes": r["Average Content Size"]})
     return pd.DataFrame(linhas)
 
 
 def linha(df, col, titulo, ylabel, arq, logy=False):
-    t = df[df.op == "TOTAL"]
-    plt.figure(figsize=(7, 4.2))
-    for tec in TECS:
-        d = t[t.tec == tec].sort_values("usuarios")
-        plt.plot(d.usuarios, d[col], marker="o", ls="-" if tec in BASE else "--", label=NOMES[tec])
-    plt.xscale("log"); plt.xlabel("usuários simultâneos"); plt.ylabel(ylabel); plt.title(titulo)
-    if logy: plt.yscale("log")
-    plt.grid(alpha=.3); plt.legend(fontsize=7, ncol=2); plt.tight_layout(); plt.savefig(f"graficos/{arq}.png", dpi=150); plt.close()
+    g = df[df.op == "TOTAL"].groupby(["usuarios", "tec"])[col]
+    d = g.mean().unstack()[TECS].rename(columns=NOMES)
+    e = g.std().unstack()[TECS].rename(columns=NOMES).fillna(0)  # desvio padrão entre repetições
+    ax = d.plot.bar(figsize=(9, 4.2), logy=logy, rot=0, yerr=e, error_kw={"elinewidth": 1, "capsize": 1.5})
+    ax.set_xlabel("usuários simultâneos"); ax.set_ylabel(ylabel); ax.set_title(titulo); ax.grid(axis="y", alpha=.3)
+    ax.legend(loc="upper left", bbox_to_anchor=(1.01, 1), fontsize=8)
+    plt.tight_layout(); plt.savefig(f"graficos/{arq}.png", dpi=150); plt.close()
 
 
 def barras_bytes(df, usuarios, arq="bytes_por_operacao"):
-    d = df[(df.op != "TOTAL") & (df.usuarios == usuarios)].pivot(index="op", columns="tec", values="bytes")[TECS]
+    d = df[(df.op != "TOTAL") & (df.usuarios == usuarios)].pivot_table(index="op", columns="tec", values="bytes")[TECS]
     d.columns = [NOMES[c] for c in d.columns]
     ax = d.plot.bar(figsize=(9, 4.5), logy=True)
     ax.set_ylabel("bytes médios por resposta (log)"); ax.set_xlabel(""); ax.set_title("Tamanho da resposta por operação")
+    ax.legend(loc="upper left", bbox_to_anchor=(1.01, 1))
     plt.xticks(rotation=30, ha="right"); plt.tight_layout(); plt.savefig(f"graficos/{arq}.png", dpi=150); plt.close()
 
 
 def main():
     os.makedirs("graficos", exist_ok=True)
     df = carregar()
-    t = df[df.op == "TOTAL"].sort_values(["usuarios", "tec"])
+    t = df[df.op == "TOTAL"].groupby(["usuarios", "tec"]).agg(
+        reps=("rep", "nunique"), reqs=("reqs", "sum"), falhas=("falhas", "sum"), rps=("rps", "mean"), rps_dp=("rps", "std"),
+        media_ms=("media_ms", "mean"), media_ms_dp=("media_ms", "std"), p95_ms=("p95_ms", "mean"), p95_ms_dp=("p95_ms", "std"),
+        bytes=("bytes", "mean")).reset_index()
     t.assign(falhas_pct=100 * t.falhas / t.reqs).to_csv("tabela.csv", index=False, float_format="%.1f")
     print(t.to_string(index=False))
     linha(df, "rps", "Vazão (req/s) x carga", "requisições por segundo", "vazao")

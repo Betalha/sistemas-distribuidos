@@ -49,7 +49,7 @@ Mesmo contrato do Python, então o mesmo `locustfile.py` mede as duas linguagens
 - Um teste curto antes da bateria achou dois bugs, já corrigidos: o Locust não coletava as tarefas do mixin e o gRPC falhava ao converter mensagem em dicionário.
 
 ### A análise
-`graficos.py` lê a linha `Aggregated` de cada CSV do Locust e gera `tabela.csv` e os gráficos em `graficos/`: vazão, tempo médio, p95 e bytes por operação.
+`graficos.py` lê a linha `Aggregated` de cada CSV do Locust e gera `tabela.csv` e os gráficos em `graficos/`: vazão, tempo médio e p95 por carga e bytes por operação, todos em barras.
 
 ## 3. Estrutura
 - `app/`: serviços Python, `.proto`, `Dockerfile`, `locustfile.py`
@@ -57,11 +57,11 @@ Mesmo contrato do Python, então o mesmo `locustfile.py` mede as duas linguagens
 - `docker-compose.yml`: 8 serviços (Python nas portas 8001 a 8004, Java de 8011 a 8014); `locust` no perfil `tools`
 - `testes.sh`: bateria completa (8 serviços x usuários)
 - `graficos.py`: tabela e gráficos
-- `resultados/`: CSVs do Locust; `graficos/` e `tabela.csv`: saída da análise
+- `resultados/rep1/`: CSVs do Locust da bateria (32 execuções); `graficos/` e `tabela.csv`: saída da análise
 
 ## 4. Como reproduzir
 ```bash
-./testes.sh                  # ~25 min, gera resultados/*.csv
+./testes.sh                  # ~25 min, gera resultados/*_stats.csv (a bateria entregue foi movida para resultados/rep1/)
                              # variar: DURACAO=60s USUARIOS="10 100" ./testes.sh
 python3 graficos.py          # tabela.csv e graficos/*.png
 python3 graficos.py --test   # checagem rápida do script
@@ -87,13 +87,14 @@ Os números do Python mudaram um pouco em relação à bateria anterior (por exe
 
 **Entre tecnologias (dentro de cada linguagem):**
 - **GraphQL em Python** trava em ~230 req/s e o tempo explode (média de 2 s com 500 usuários). Cada requisição gasta muita CPU resolvendo campos e relações no Strawberry.
-- **gRPC** é o mais rápido nas duas linguagens e o único que passa de ~2300 req/s. Protobuf binário e HTTP/2 são mais baratos e a resposta é menor.
-- **REST e SOAP** ficam entre os dois. O SOAP escrito à mão tem tamanho de resposta ~1,8x maior que o REST, mas o servidor faz menos trabalho que o FastAPI com validação.
+- **gRPC** é o mais rápido nas duas linguagens e o único que passa de ~2400 req/s. Protobuf binário e HTTP/2 são mais baratos e a resposta é menor.
+- **REST e SOAP** ficam entre os dois. O SOAP escrito à mão tem tamanho de resposta ~1,8x maior que o REST, mas o servidor provavelmente faz menos trabalho que o FastAPI com validação.
 
 **Entre linguagens (o achado novo):**
 - **O GraphQL é o que mais muda.** Em Java ele fica junto de REST e SOAP (~2100 req/s com 200 usuários), contra 232 em Python. Boa parte do custo do GraphQL em Python é da biblioteca (Strawberry), não da ideia de GraphQL.
 - **gRPC em Java** chega a 5669 req/s com 500 usuários e média de 1,9 ms, contra 4593 req/s e 22 ms em Python.
-- **REST, SOAP e GraphQL em Java parecem bater num teto comum (~2100 a 2400 req/s).** Como esse teto é quase igual para três tecnologias diferentes e também aparece no SOAP e gRPC em Python, a hipótese é que o limite seja o gerador de carga (Locust, 2 processos) e não os serviços. Não foi verificado.
+- **Com 200 usuários o patamar de ~2100 a 2300 req/s é a demanda, não um limite.** 200 usuários com ~0,1 s de espera geram no máximo ~2000 a 2300 req/s, e todos os serviços que aguentam isso (inclusive o gRPC em Python e em Java) ficam nesse valor, como ocorreu com 10 e 50 usuários.
+- **Com 500 usuários, REST, SOAP e GraphQL em Java e o SOAP em Python estacionam em ~2150 a 2370 req/s**, apesar de a demanda chegar a ~5000. Como o valor é quase igual para tecnologias diferentes, a hipótese é que o limite seja o gerador de carga (Locust, 2 processos) e não os serviços. O gRPC em Java chegou a 5669 req/s, o que enfraquece a hipótese (o cliente gRPC do Locust pode ser mais leve que o HTTP). Não foi verificado.
 - **O p95 do Java HTTP é ~42 ms mesmo com 10 usuários**, enquanto a média é de 5 a 8 ms. É um degrau fixo, que sugere um atraso de ~40 ms de ACK do TCP no servidor HTTP do JDK em parte das respostas. Também não foi verificado; o gRPC em Java não tem esse degrau.
 
 **Média x p95.** O p95 mostra a cauda que a média esconde. Com 500 usuários, o p95 do GraphQL em Python é 2300 ms e o do gRPC em Java é 2 ms.
@@ -120,7 +121,7 @@ class Playlist:
 ```
 
 **SOAP** (W3C, fim dos anos 1990). Mensagens em envelope XML, normalmente com contrato WSDL e extensões WS-*.
-- Prós: contrato formal, padrões corporativos (segurança, transação). Contras: verboso, mais lento, ferramental pesado.
+- Prós: contrato formal, padrões corporativos (segurança, transação). Contras: verboso (mais bytes e mais CPU para XML), ferramental pesado. Nos testes, o SOAP escrito à mão não ficou mais lento que o REST (ver seção 9).
 ```python
 OPS["ListPlaylistsByUser"] = lambda p: data.playlists_of_user(p["user_id"])
 ```
